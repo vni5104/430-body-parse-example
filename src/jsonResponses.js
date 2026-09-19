@@ -12,7 +12,7 @@ const respondJSON = (request, response, status, object) => {
     'Content-Length': Buffer.byteLength(content, 'utf8'),
   });
 
-  if(request.method !== 'HEAD') {
+  if(request.method !== 'HEAD' && status != 204) {
     response.write(JSON.stringify(object));
   }
 
@@ -52,7 +52,7 @@ const addUser = (request, response) => {
   //201 = Created Successfully
   if (statusCode === 201) {
     responseJSON.message = "User Successfully Created";
-    return respondJSON(request, response, status, responseJSON);
+    return respondJSON(request, response, statusCode, responseJSON);
   }
 
   //return 204 (No need to send body; we can send an empty object back)

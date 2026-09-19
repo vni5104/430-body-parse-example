@@ -19,13 +19,26 @@ const parseBody = (request, response, handler) => {
   });
 
   request.on('end', () => {
-    const bodyStr = Buffer.concat(body).toString();
-    console.log(bodyStr);
+    const bodyString = Buffer.concat(body).toString();
+
+    const type = request.headers['content-type'];
+    
+    if (type === 'application/x-www-form-urlencoded') {
+      request.body = query.parse(bodyString);
+    } else if (type === 'application/json') {
+      request.body = JSON.parse(bodyString);
+    } else {
+      response.writeHead(400, {'Content-Type': 'application/json'});
+      response.write(JSON.stringify({message: 'invalid data format', id: 'invalidFormat'}));
+      response.end();
+    }
+
+    handler(request, response);
   });
 };
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedURL.pathname === '/addUser') {
+  if (parsedUrl.pathname === '/addUser') {
     //jsonHandler.addUser(request, response);
     parseBody(request, response, jsonHandler.addUser);
   }
